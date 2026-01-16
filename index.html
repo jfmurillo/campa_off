@@ -51,10 +51,13 @@
       const json = JSON.parse(text.substring(47).slice(0, -2));
       const rows = json.table.rows;
 
-      let data = rows.map(r => ({
-        equipo: r.c[0].v,
-        puntos: r.c[1].v
-      }));
+let data = rows
+  .filter(r => r.c[0] && r.c[1])
+  .map(r => ({
+    equipo: r.c[0].v,
+    puntos: r.c[1].v
+  }));
+
 
       data.sort((a, b) => b.puntos - a.puntos);
 
