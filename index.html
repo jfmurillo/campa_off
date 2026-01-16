@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Marcador en Vivo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+    }
+
+    .team {
+      background: white;
+      margin: 10px auto;
+      padding: 20px;
+      border-radius: 12px;
+      max-width: 400px;
+      font-size: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .leader {
+      border: 4px solid gold;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🏆 Marcador en Vivo</h1>
+  <div id="scoreboard"></div>
+
+  <script>
+    const SHEET_ID = "PEGA_AQUI_TU_ID";
+    const SHEET_NAME = "API";
+    const URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json&sheet=${SHEET_NAME}`;
+
+    async function cargarDatos() {
+      const res = await fetch(URL);
+      const text = await res.text();
+      const json = JSON.parse(text.substring(47).slice(0, -2));
+      const rows = json.table.rows;
+
+      let data = rows.map(r => ({
+        equipo: r.c[0].v,
+        puntos: r.c[1].v
+      }));
+
+      data.sort((a, b) => b.puntos - a.puntos);
+
+      const contenedor = document.getElementById("scoreboard");
+      contenedor.innerHTML = "";
+
+      data.forEach((team, i) => {
+        const div = document.createElement("div");
+        div.className = "team" + (i === 0 ? " leader" : "");
+        div.innerHTML = `<span>${i === 0 ? "🥇" : ""} ${team.equipo}</span><span>${team.puntos}</span>`;
+        contenedor.appendChild(div);
+      });
+    }
+
+    cargarDatos();
+    setInterval(cargarDatos, 5000); // actualiza cada 5 segundos
+  </script>
+
+</body>
+</html>
